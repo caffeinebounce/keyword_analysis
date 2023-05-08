@@ -5,12 +5,35 @@ from collections import Counter
 
 nltk.download("stopwords")
 nltk.download("punkt")
+nltk.download('wordnet')
+
+from nltk.stem import WordNetLemmatizer
 
 def extract_keywords(text, top_n=10):
+    # Load custom e-commerce common words
+    with open('filter_list.txt', 'r') as f:
+        ecommerce_common_words = set(word.strip() for word in f.readlines())
+
     stop_words = set(stopwords.words("english"))
+
+    # Lemmatize words
+    lemmatizer = WordNetLemmatizer()
+    
+    # Lemmatize custom e-commerce common words
+    ecommerce_common_words = set(lemmatizer.lemmatize(word) for word in ecommerce_common_words)
+
+    # Update the stopwords list with the custom e-commerce words
+    stop_words.update(ecommerce_common_words)
+
     words = word_tokenize(text)
 
-    words = [word.lower() for word in words if word.isalnum()]
+    # Filter out words that are not alphabetic
+    words = [word.lower() for word in words if word.isalpha()]
+
+    # Lemmatize words in the text
+    words = [lemmatizer.lemmatize(word) for word in words]
+    
+    # Remove stopwords
     words = [word for word in words if word not in stop_words]
 
     freq = Counter(words)
