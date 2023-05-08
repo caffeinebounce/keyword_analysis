@@ -34,3 +34,5 @@ access
 update
 deal
 empty
+use
+help
